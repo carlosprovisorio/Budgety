@@ -29,7 +29,7 @@ var budgetController = (function() {
  return {
   addItem: function(type, des, val) {
     var newItem, ID;
-    
+
     //[1 2 3 4 5], next ID = 6
     //[1 2 4 6 8], next ID = 9
     //ID = last ID + 1
@@ -40,7 +40,7 @@ var budgetController = (function() {
     } else {
       ID = 0;
     }
-    
+
     //create new item based on 'inc' or 'exp' type
     if (type === 'exp') {
       newItem = new Expense(ID, des, val);
@@ -50,7 +50,7 @@ var budgetController = (function() {
 
     //Push it into our data structure
     data.allItems[type].push(newItem);
-    
+
     //Return the new element
     return newItem;
   }
@@ -82,7 +82,7 @@ var UIController = (function() {
         value: document.querySelector(DOMstrings.inputValue).value
       };
     },
-    
+
     addListItem: function(obj, type) {
       var html, newHtml, element;
       // Create HTML string with placeholder text
@@ -104,6 +104,19 @@ var UIController = (function() {
     document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
     },
 
+    clearFields: function() {
+      var fields, fieldsArr;
+
+      fields = document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
+
+        fieldsArr = Array.prototype.slice.call(fields);
+
+        fieldsArr.forEach(function(current, index, array) {
+          current.value = "";
+        });
+
+        fieldsArr[0].focus();
+    },
 
     getDOMstrings: function() {
       return DOMstrings;
@@ -118,7 +131,7 @@ var UIController = (function() {
 // GLOBAL APP CONTROLLER
 
 var controller = (function(budgetCtrl, UICtrl) {
-  
+
   var setupEventListeners = function() {
 
     var DOM = UICtrl.getDOMstrings();
@@ -141,8 +154,10 @@ var controller = (function(budgetCtrl, UICtrl) {
     newItem = budgetCtrl.addItem(input.type, input.description, input.value)
     // 3. Add the item to the UI
    UICtrl.addListItem(newItem, input.type);
+    // 4. Clear the fields
+    UICtrl.clearFields();
     // 4. Calculate the budget
-    
+
     // 5. Display the budget on the UI
 
   };
