@@ -6,6 +6,20 @@ var budgetController = (function() {
   this.id = id;
   this.description = description;
   this.value = value;
+  this.percentage = -1;
+ };
+
+ Expense.prototype.calcPercentage = function(totalIncome) {
+
+   if (totalIncome > 0) {
+    this.pencentage = Math.round((this.value / totalIncome) * 100);
+   } else {
+    this.percentage = -1;
+   }
+ };
+
+ Expense.prototype.getPercentage = function() {
+  return this.percentage;
  };
 
  var Income = function(id, description, value) {
@@ -94,6 +108,19 @@ var budgetController = (function() {
     } else {
       data.percentage = -1;
     }
+   },
+
+   calculatePercentages: function() {
+    data.allItems.exp.forEach(function(cur) {
+      cur.calcPercentage(data.totals.inc);
+    });
+   },
+
+   getPercentages: function() {
+    var allPerc = data.allItems.exp.map(function(cur) {
+      return cur.getPercentage();
+    });
+    return allPerc;
    },
 
    getBudget: function() {
@@ -230,7 +257,16 @@ var controller = (function(budgetCtrl, UICtrl) {
     var budget = budgetCtrl.getBudget(); 
     // 3. Display the budget on the UI
     UICtrl.displayBudget(budget);
-  }
+  };
+
+  var updatePencentages = function() {
+    // 1. Calculate de percentages
+    budgetCtrl.calculatePercentages(); 
+    // 2. Read pencentage from the budget controller
+    var percentages = budgetCtrl.getPercentages();
+    // 3. update UI with the new percentages
+    console.log(percentages);
+  };
 
   var crtlAddItem = function() {
     var input, newItem;
@@ -246,8 +282,11 @@ var controller = (function(budgetCtrl, UICtrl) {
       UICtrl.addListItem(newItem, input.type);
       // 4. Clear the fields
       UICtrl.clearFields();
-      // 4. Clear the fields
+      // 5. Clear the fields
       updateBudget();
+
+      // 6. Calculate and update percentages
+      updatePencentages();
     }
 
   };
@@ -270,6 +309,9 @@ var controller = (function(budgetCtrl, UICtrl) {
 
       //3. Update and show the new budget
       updateBudget();
+      
+      //4. Calculate and update percentages
+      updatePencentages();
     }
 
   };
